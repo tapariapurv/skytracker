@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyTrack - Real-time Flight Tracker</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b', // Custom dark shade
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-white h-screen w-screen overflow-hidden font-sans">
+
+    <!-- Map Container -->
+    <div id="map" class="absolute inset-0 z-0"></div>
+
+    <!-- Sidebar / Overlay -->
+    <div class="absolute top-0 left-0 h-full w-full md:w-96 bg-slate-900/95 backdrop-blur-md border-r border-slate-700 z-10 transform transition-transform duration-300 -translate-x-full md:translate-x-0 flex flex-col shadow-2xl" id="sidebar">
+        
+        <!-- Header -->
+        <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-airplane-tilt text-blue-400 text-2xl"></i>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">SkyTrack</h1>
+            </div>
+            <button id="toggleSidebar" class="md:hidden text-slate-400 hover:text-white">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="p-4 border-b border-slate-700">
+            <div class="relative">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" placeholder="Search callsign or country..." 
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-200 placeholder-slate-500 transition-all">
+            </div>
+            <div class="mt-3 flex justify-between text-xs text-slate-400">
+                <span id="flightCount">Loading flights...</span>
+                <span id="lastUpdated">Updating...</span>
+            </div>
+        </div>
+
+        <!-- Flight List -->
+        <div id="flightList" class="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+            <!-- Flight items will be injected here -->
+            <div class="text-center text-slate-500 mt-10">
+                <div class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-blue-500 rounded-full" role="status" aria-label="loading"></div>
+                <p class="mt-2">Scanning airspace...</p>
+            </div>
+        </div>
+
+        <!-- Selected Flight Details (Bottom Panel in Sidebar) -->
+        <div id="flightDetails" class="p-4 bg-slate-800 border-t border-slate-700 hidden">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 id="detailCallsign" class="text-2xl font-bold text-white">BAW123</h2>
+                    <p id="detailCountry" class="text-sm text-slate-400">United Kingdom</p>
+                </div>
+                <button id="closeDetails" class="text-slate-400 hover:text-white">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="bg-slate-700/50 p-2 rounded">
+                    <p class="text-slate-400 text-xs">Altitude</p>
+                    <p id="detailAltitude" class="font-mono text-blue-300">35,000 ft</p>
+                </div>
+                <div class="bg-slate-700/50 p-2 rounded">
+                    <p class="text-slate-400 text-xs">Velocity</p>
+                    <p id="detailVelocity" class="font-mono text-green-300">450 kts</p>
+                </div>
+                <div class="bg-slate-700/50 p-2 rounded">
+                    <p class="text-slate-400 text-xs">Latitude</p>
+                    <p id="detailLat" class="font-mono">51.5074</p>
+                </div>
+                <div class="bg-slate-700/50 p-2 rounded">
+                    <p class="text-slate-400 text-xs">Longitude</p>
+                    <p id="detailLon" class="font-mono">-0.1278</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button id="mobileMenuBtn" class="absolute top-4 left-4 z-20 md:hidden bg-slate-800 p-2 rounded-lg shadow-lg text-white border border-slate-700">
+        <i class="ph ph-list text-xl"></i>
+    </button>
+
+    <!-- Main Script -->
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
